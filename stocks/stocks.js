@@ -28,7 +28,7 @@ function isValidSymbol(str) {
 }
 
 // Fetch stock data
-fetch('https://green-stonks-21.joshsi.workers.dev/')
+fetch('https://api.joshsi.com')
 .then(response => {
   if (!response.ok) {
     throw new Error('Network response failed');
