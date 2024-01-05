@@ -1,0 +1,33 @@
+#smallText {
+  font-size: 12px;
+  text-align: right;
+}
+
+h2 {
+  padding: 10px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+#stockBoard {
+  padding: 20px;
+  font-size: 20px;
+  line-height: 2;
+  border: 2px solid;
+}
+
+.stockItem {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  animation: fadeIn 1s;
+}
+
+.stockSymbol {
+  font-weight: bold;
+}
+
+.stockInfo {
+  text-align: right;
+}

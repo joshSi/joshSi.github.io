@@ -75,7 +75,7 @@ h1 {
 /* Dark mode styles */
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #333333;
+    background-color: #333;
     color: #ffffff;
   }
   .social-icons a {
