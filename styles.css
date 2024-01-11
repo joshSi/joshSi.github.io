@@ -72,8 +72,8 @@ typing-text {
     background-color: #ffffff;
     color: #333;
   }
-  .social-icons a {
-    color: #333;
+  svg path {
+    fill: #333;
   }
 
   .cursor {
@@ -87,8 +87,9 @@ typing-text {
     background-color: #333;
     color: #ffffff;
   }
-  .social-icons a {
-    color: #ffffff;
+
+  svg path {
+    fill: #ffffff;
   }
 
   .cursor {
