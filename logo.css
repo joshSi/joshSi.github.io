@@ -1,0 +1,16 @@
+.rotating-image {
+  width: 100px;
+  height: 100px;
+  background: url('favicon.ico');
+  background-size: cover;
+  animation: rotateAnimation 4s linear infinite;
+}
+
+@keyframes rotateAnimation {
+  0% {
+    transform: perspective(200px);
+  }
+  100% {
+    transform: perspective(200px) rotateY(360deg);
+  }
+}
