@@ -62,6 +62,7 @@ th, td {
 
 typing-text {
   height: 24px;
+  line-height: 1;
 }
 
 .cursor {
