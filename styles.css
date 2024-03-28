@@ -9,8 +9,23 @@ body {
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
+.plain {
+  text-decoration: none;
+}
+
 a {
   color: inherit;
+  transition: color 0.5s ease;
+  svg {
+    transition: fill 0.5s ease;
+  }
+}
+
+a:hover {
+  color: #0073b1;
+  svg {
+    fill: #0073b1;
+  }
 }
 
 h1 {
@@ -24,6 +39,27 @@ table {
   margin: auto;
 }
 
+container {
+  display: flex;
+  align-items: center;
+}
+
+.image {
+  max-width: 20%;
+  float: left;
+  margin-right: 5%;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  container {
+    flex-direction: column;
+    min-height: 400px;
+    overflow-y: hidden;
+  }
+}
+
 th, td {
   border: 1px solid #dddddd;
   text-align: center;
@@ -32,32 +68,25 @@ th, td {
 
 .content {
   min-height: 100%;
-  margin-bottom: -120px; 
+  margin-bottom: -60px; 
   overflow-y: hidden;
 }
 
 .footer {
-  height: 120px;
+  height: 60px;
 }
 
 .social-icons {
   display: inline-block;
   list-style: none;
   padding: 0;
-}
-
-.social-icons li {
-  display: inline;
-  margin: 0 10px;
-}
-
-.social-icons a {
-  text-decoration: none;
-  transition: color 0.5s ease;
-}
-
-.social-icons a:hover {
-  fill: #0073b1;
+  li {
+    display: inline;
+    margin: 0 10px;
+    a {
+      text-decoration: none;
+    }
+  }
 }
 
 typing-text {
@@ -79,6 +108,12 @@ typing-text {
   100% { opacity: 1; }
 }
 
+#pdf-viewer {
+  width: 80%;
+  height: 600px; /* Adjust height as needed */
+  border: 1px solid #ccc;
+}
+
 /* Light mode styles */
 @media (prefers-color-scheme: light) {
   body {
@@ -94,7 +129,7 @@ typing-text {
     background-color: #f5f5f5;
   }
 
-  .social-icons a {
+  a {
     fill: #333;
   }
 
@@ -118,7 +153,7 @@ typing-text {
     background-color: #444;
   }
 
-  .social-icons a {
+  a {
     fill: #ffffff;
   }
 
