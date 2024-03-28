@@ -69,7 +69,7 @@ function isValidSymbol(str) {
 }
 
 // Fetch stock data
-fetch('https://api.joshsi.com')
+fetch('https://api.joshsi.com/stocks')
 .then(response => {
   if (!response.ok) {
     throw new Error('Network response failed');
