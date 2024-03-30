@@ -45,7 +45,7 @@ container {
 }
 
 .image {
-  max-width: 20%;
+  max-width: 40%;
   float: left;
   margin-right: 5%;
   border-radius: 50%;
@@ -55,7 +55,6 @@ container {
 @media (max-width: 600px) {
   container {
     flex-direction: column;
-    min-height: 400px;
     overflow-y: hidden;
   }
 }
@@ -68,12 +67,8 @@ th, td {
 
 .content {
   min-height: 100%;
-  margin-bottom: -60px; 
+  margin-bottom: 60px; 
   overflow-y: hidden;
-}
-
-.footer {
-  height: 60px;
 }
 
 .social-icons {
@@ -106,12 +101,6 @@ typing-text {
   0% { opacity: 1; }
   50% { opacity: 0; }
   100% { opacity: 1; }
-}
-
-#pdf-viewer {
-  width: 80%;
-  height: 600px; /* Adjust height as needed */
-  border: 1px solid #ccc;
 }
 
 /* Light mode styles */
