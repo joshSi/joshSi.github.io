@@ -14,6 +14,8 @@ class TypingText extends HTMLElement {
   }
 
   typeWriter() {
+    console.log("Screen width: " + window.innerWidth);
+    console.log("Screen height: " + window.innerHeight);
     const phrase = this.texts[this.current];
 
     this.charIndex = this.isDeleting ? this.charIndex - 1 : this.charIndex + 1;
