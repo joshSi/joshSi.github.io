@@ -12,7 +12,7 @@ export default async function Home() {
             I&apos;m Josh Si, software engineer based in the San Francisco Bay Area.
           </h1>
           <div className="mt-6 space-y-7 text-base text-zinc-600 dark:text-zinc-400">
-            I am currently focused on Enterprise AI, improving the development experience with the C3 AI Platform.
+            I work on the Cloud Platform team at C3 AI, enhancing the developer experience with C3 AI Studio.
           </div>
         </div>
         <div className="lg:pl-20">
