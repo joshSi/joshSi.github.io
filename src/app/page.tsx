@@ -39,7 +39,7 @@ export default async function Home() {
             icon={LinkedIn}
           />
           <SocialLink
-            href="mailto:josh.j.si@proton.me"
+            href="mailto:contact@joshsi.com"
             aria-label="Email me"
             icon={Mail}
           />
