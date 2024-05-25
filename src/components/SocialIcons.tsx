@@ -49,7 +49,7 @@ export function Mail(props: React.ComponentPropsWithoutRef<'svg'>) {
         className="fill-zinc-100 stroke-zinc-400 dark:fill-zinc-100/10 dark:stroke-zinc-500"
       />
       <path
-        d="m4 6 6.024 5.479a2.915 2.915 0 0 0 3.952 0L20 6"
+        d="m4 5.5 6.024 5.479a2.915 2.915 0 0 0 3.952 0L20 5.5"
         className="stroke-zinc-400 dark:stroke-zinc-500"
       />
     </svg>
