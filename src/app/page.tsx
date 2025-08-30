@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Container } from "@/components/Container";
 import { SocialLink, GitHub, LinkedIn, Mail } from "@/components/SocialIcons";
+import Link from "next/link";
 import headshot from '@/assets/headshot.jpg'
 
 export default async function Home() {
@@ -12,7 +13,16 @@ export default async function Home() {
             I&apos;m Josh Si, software engineer based in the San Francisco Bay Area.
           </h1>
           <div className="mt-6 space-y-7 text-base text-zinc-600 dark:text-zinc-400">
-            I work on the Cloud Platform team at C3 AI, enhancing the developer experience with C3 AI Studio.
+            I work on {' '}
+            <Link
+              href="https://cloud.google.com/security/products/security-operations"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline transition hover:text-blue-700 focus-visible:outline-dotted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 dark:text-blue-400 dark:hover:text-blue-300 dark:focus-visible:outline-blue-400"
+            >
+              Google SecOps
+            </Link>
+            , helping security teams detect and respond to cybersecurity threats quickly.
           </div>
         </div>
         <div className="lg:pl-20">
