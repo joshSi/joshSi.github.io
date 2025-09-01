@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Container } from "@/components/Container";
 import { SocialLink, GitHub, LinkedIn, Mail } from "@/components/SocialIcons";
 import Link from "next/link";
-import headshot from '@/assets/headshot.jpg'
+import headshot from '@/assets/headshot.webp'
 
 export default async function Home() {
   return (
