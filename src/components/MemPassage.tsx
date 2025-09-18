@@ -32,11 +32,16 @@ export function MemPassage({
     containerRef.current?.focus();
   }, []);
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === ' ' && typedText.endsWith(' ')) return;
+    onKeyPress(event);
+  };
+
   return (
     <div
       ref={containerRef}
       className={clsx(className, 'prose dark:prose-invert outline-none border p-4 rounded-md focus:ring-2 focus:ring-blue-500 min-h-[6rem]')}
-      onKeyDown={onKeyPress}
+      onKeyDown={handleKeyPress}
       tabIndex={0}
       {...props}
     >
