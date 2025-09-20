@@ -3,6 +3,7 @@ import { Container } from "@/components/Container";
 import { SocialLink, GitHub, LinkedIn, Mail } from "@/components/SocialIcons";
 import Link from "next/link";
 import headshot from '@/assets/headshot.webp'
+import { Button } from "@/components/Button";
 
 export default async function Home() {
   return (
@@ -24,6 +25,10 @@ export default async function Home() {
             </Link>
             , helping security teams detect and respond to cybersecurity threats quickly.
           </div>
+        <div className="mt-12 lg:mt-32">
+          Check out my cool{' '}
+          <Button href="/memorize" variant="secondary">Memorization Tool</Button>
+        </div>
         </div>
         <div className="lg:pl-20">
           <div className="max-w-xs px-2.5 lg:max-w-none">
