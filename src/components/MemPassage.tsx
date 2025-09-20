@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from 'clsx';
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 
 interface MemPassageProps extends React.ComponentPropsWithoutRef<'div'> {
   text: string;
@@ -31,13 +31,6 @@ export function MemPassage({
   className,
   ...props
 }: MemPassageProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-
-  useEffect(() => {
-    containerRef.current?.focus();
-  }, []);
-
   const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === ' ' && typedText.endsWith(' ')) return;
     onKeyPress(event);
@@ -50,7 +43,7 @@ export function MemPassage({
 
   return (
     <div
-      ref={containerRef}
+      title="Try to type the text from memory here"
       className={clsx(className, 'prose dark:prose-invert outline-none border p-4 rounded-md focus:ring-2 focus:ring-blue-500')}
       onKeyDown={handleKeyPress}
       tabIndex={0}
@@ -69,7 +62,7 @@ export function MemPassage({
           const isCorrect = isCaseSensitive ? typedChar === originalCleanChar : typedChar.toLowerCase() === originalCleanChar.toLowerCase();
           return (
             <span key={index} className={clsx({'text-green-600 dark:text-green-400': isCorrect, 'text-red-500 bg-red-100 dark:bg-red-900/50 rounded-sm': !isCorrect})}>
-              {isCorrect? char : typedChar}
+              {isCorrect ? char : typedChar}
             </span>
           );
         } else {
@@ -83,3 +76,4 @@ export function MemPassage({
     </div>
   );
 }
+

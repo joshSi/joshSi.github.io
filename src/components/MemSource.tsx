@@ -31,6 +31,7 @@ export const MemSource = ({ text, onTextChange }: MemSourceProps) => {
           <input
             type="password"
             className="bg-transparent shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
+            title="Paste the source text here"
             value={inputText}
             onChange={handleInputChange}
           />
