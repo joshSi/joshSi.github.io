@@ -4,14 +4,12 @@ import React, { useState, useMemo } from 'react';
 import { useStickyState } from '@/hooks/useStickyState';
 import { MemPassageSettings, DisplayMode } from './MemPassageSettings';
 import { MemPassage } from './MemPassage';
+import { MemSource } from './MemSource';
 import { Container } from './Container';
 
-interface MemorizationPracticeProps {
-  text: string;
-}
-
-export function MemorizationPractice({ text }: MemorizationPracticeProps) {
+export function MemorizationPractice() {
   const [typedText, setTypedText] = useState('');
+  const [text, setText] = useState(typedText);
 
   // All state is managed here in the parent component
   const [isCaseSensitive, setIsCaseSensitive] = useStickyState(true, 'mempassage-case-sensitive');
@@ -69,6 +67,7 @@ export function MemorizationPractice({ text }: MemorizationPracticeProps) {
 
   return (
     <Container>
+      <MemSource text={text} onTextChange={setText} />
       <MemPassageSettings
         isCaseSensitive={isCaseSensitive}
         onCaseSensitiveChange={setIsCaseSensitive}
