@@ -21,7 +21,7 @@ export function MemorizationPractice() {
     // ... (logic from the original component)
     let processed = '';
     const indices: number[] = [];
-    const puncRegex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/;
+    const puncRegex = /[!"#$%&'()*+,-./:;<=>?@[\]\^_`{|}~]/;
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
         if (!checkPunctuation && puncRegex.test(char)) continue;
@@ -89,3 +89,4 @@ export function MemorizationPractice() {
     </Container>
   );
 }
+

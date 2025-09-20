@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from 'clsx';
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 
 interface MemPassageProps extends React.ComponentPropsWithoutRef<'div'> {
   text: string;
@@ -12,6 +12,11 @@ interface MemPassageProps extends React.ComponentPropsWithoutRef<'div'> {
   cleanText: string;
   originalIndices: number[];
   visibilityMap: boolean[];
+}
+
+function filterPunctuation(checkPunctuation: boolean, text: string) {
+  if (checkPunctuation) return text;
+  return text.replace(/[!"#$%&'()*+,-./:;<=>?@[\]\^_`{|}~]/g, '');
 }
 
 export function MemPassage({
@@ -28,6 +33,7 @@ export function MemPassage({
 }: MemPassageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
+
   useEffect(() => {
     containerRef.current?.focus();
   }, []);
@@ -37,10 +43,15 @@ export function MemPassage({
     onKeyPress(event);
   };
 
+  const filteredPunctuation = useMemo(
+    () => filterPunctuation(checkPunctuation, typedText),
+    [typedText, checkPunctuation]
+  );
+
   return (
     <div
       ref={containerRef}
-      className={clsx(className, 'prose dark:prose-invert outline-none border p-4 rounded-md focus:ring-2 focus:ring-blue-500 min-h-[6rem]')}
+      className={clsx(className, 'prose dark:prose-invert outline-none border p-4 rounded-md focus:ring-2 focus:ring-blue-500')}
       onKeyDown={handleKeyPress}
       tabIndex={0}
       {...props}
@@ -51,14 +62,14 @@ export function MemPassage({
           return <span key={index} className="text-gray-400">{char}</span>;
         }
 
-        const hasTyped = processedIndex < typedText.length;
+        const hasTyped = processedIndex < filteredPunctuation.length;
         if (hasTyped) {
-          const typedChar = typedText[processedIndex];
+          const typedChar = filteredPunctuation[processedIndex];
           const originalCleanChar = cleanText[processedIndex];
           const isCorrect = isCaseSensitive ? typedChar === originalCleanChar : typedChar.toLowerCase() === originalCleanChar.toLowerCase();
           return (
             <span key={index} className={clsx({'text-green-600 dark:text-green-400': isCorrect, 'text-red-500 bg-red-100 dark:bg-red-900/50 rounded-sm': !isCorrect})}>
-              {typedChar}
+              {isCorrect? char : typedChar}
             </span>
           );
         } else {

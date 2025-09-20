@@ -9,6 +9,17 @@ interface MemSourceProps {
 }
 
 export const MemSource = ({ text, onTextChange }: MemSourceProps) => {
+  const [inputText, setInputText] = useState(text);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const filteredText = event.target.value
+      .replace(/\n/g, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/^\s+|\s+$/g, '')
+      .trim();
+    setInputText(filteredText);
+    onTextChange(filteredText);
+  };
 
   return (
     <div className="flex flex-col">
@@ -20,7 +31,8 @@ export const MemSource = ({ text, onTextChange }: MemSourceProps) => {
           <input
             type="password"
             className="bg-transparent shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline"
-            onChange={(e) => onTextChange(e.target.value)}
+            value={inputText}
+            onChange={handleInputChange}
           />
         </div>
       </form>
