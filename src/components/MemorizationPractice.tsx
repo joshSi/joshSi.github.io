@@ -13,14 +13,11 @@ interface MemorizationPracticeProps {
 export function MemorizationPractice({ text }: MemorizationPracticeProps) {
   const [typedText, setTypedText] = useState('');
 
-  // All state is managed here in the parent component
   const [isCaseSensitive, setIsCaseSensitive] = useStickyState(true, 'mempassage-case-sensitive');
   const [checkPunctuation, setCheckPunctuation] = useStickyState(true, 'mempassage-check-punctuation');
   const [displayMode, setDisplayMode] = useStickyState<DisplayMode>('hidden', 'mempassage-display-mode');
-  
-  // All derived data is calculated here
+
   const { cleanText, originalIndices } = useMemo(() => {
-    // ... (logic from the original component)
     let processed = '';
     const indices: number[] = [];
     const puncRegex = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/;
@@ -34,7 +31,6 @@ export function MemorizationPractice({ text }: MemorizationPracticeProps) {
   }, [text, checkPunctuation]);
 
   const visibilityMap = useMemo(() => {
-    // ... (logic from the original component)
     if (displayMode === 'full') return Array(text.length).fill(true);
     if (displayMode === 'hidden') return Array(text.length).fill(false);
     
@@ -68,7 +64,7 @@ export function MemorizationPractice({ text }: MemorizationPracticeProps) {
   };
 
   return (
-    <Container>
+    <Container className="mt-16 sm:mt-16">
       <MemPassageSettings
         isCaseSensitive={isCaseSensitive}
         onCaseSensitiveChange={setIsCaseSensitive}
