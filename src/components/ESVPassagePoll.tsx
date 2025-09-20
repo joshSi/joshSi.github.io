@@ -9,7 +9,6 @@ interface ESVPassagePollProps {
 }
 
 const ESVPassagePoll = ({ apiKey, onPassageChange }: ESVPassagePollProps) => {
-  const [passage, setPassage] = useState<string>('');
   const [query, setQuery] = useState<string>('Psalms46:11');
 
   const fetchPassage = () => {
@@ -19,10 +18,14 @@ const ESVPassagePoll = ({ apiKey, onPassageChange }: ESVPassagePollProps) => {
     fetch(url.toString(), { headers })
       .then(response => response.json())
       .then(data => {
-        setPassage(data.passages[0].content);
-        if (onPassageChange) onPassageChange(data.passages[0].content);
-      })
-      .catch(error => console.error(error));
+        if (onPassageChange) {
+          const passage = data.passages[0].content;
+          const matches = passage.match(/^([A-Za-z]+) (.*) \(ESV\)$/);
+          if (matches) {
+            onPassageChange(matches[2].trim());
+          }
+        }
+      }).catch(error => console.error(error));
   };
 
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
