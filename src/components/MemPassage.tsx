@@ -1,7 +1,5 @@
-"use client";
-
 import clsx from 'clsx';
-import React, { useRef, useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 interface MemPassageProps extends React.ComponentPropsWithoutRef<'div'> {
   text: string;

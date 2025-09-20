@@ -1,5 +1,3 @@
-"use client";
-
 import clsx from 'clsx';
 
 export type DisplayMode = 'hidden' | 'firstLetter' | 'everyOther' | 'full';
@@ -53,3 +51,4 @@ export function MemPassageSettings({
     </>
   );
 }
+

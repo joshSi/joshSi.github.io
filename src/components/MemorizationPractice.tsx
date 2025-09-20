@@ -8,17 +8,16 @@ import { MemSource } from './MemSource';
 import { Container } from './Container';
 
 export function MemorizationPractice() {
+  // State management
   const [typedText, setTypedText] = useState('');
   const [text, setText] = useState(typedText);
 
-  // All state is managed here in the parent component
   const [isCaseSensitive, setIsCaseSensitive] = useStickyState(true, 'mempassage-case-sensitive');
   const [checkPunctuation, setCheckPunctuation] = useStickyState(true, 'mempassage-check-punctuation');
   const [displayMode, setDisplayMode] = useStickyState<DisplayMode>('hidden', 'mempassage-display-mode');
   
-  // All derived data is calculated here
+  // Calculate derived data
   const { cleanText, originalIndices } = useMemo(() => {
-    // ... (logic from the original component)
     let processed = '';
     const indices: number[] = [];
     const puncRegex = /[!"#$%&'()*+,-./:;<=>?@[\]\^_`{|}~]/;
@@ -32,7 +31,6 @@ export function MemorizationPractice() {
   }, [text, checkPunctuation]);
 
   const visibilityMap = useMemo(() => {
-    // ... (logic from the original component)
     if (displayMode === 'full') return Array(text.length).fill(true);
     if (displayMode === 'hidden') return Array(text.length).fill(false);
     
@@ -55,7 +53,7 @@ export function MemorizationPractice() {
     return map;
   }, [text, displayMode]);
 
-  // All event handling logic lives here
+  // Event handling
   const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === ' ') event.preventDefault();
     if (event.key === 'Backspace') {
