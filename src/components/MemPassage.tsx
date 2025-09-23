@@ -45,6 +45,10 @@ export function MemPassage({
       className={clsx(className, 'prose dark:prose-invert outline-none border p-4 rounded-md focus:ring-2 focus:ring-blue-500')}
       onKeyDown={handleKeyPress}
       tabIndex={0}
+      role="textbox"
+      inputMode="text"
+      contentEditable="true"
+      suppressContentEditableWarning={true}
       {...props}
     >
       {text?.split('').map((char, index) => {
