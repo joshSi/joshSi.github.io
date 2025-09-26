@@ -47,8 +47,23 @@ export function MemPassage({
       tabIndex={0}
       role="textbox"
       inputMode="text"
-      contentEditable="true"
-      suppressContentEditableWarning={true}
+      onTouchStart={() => {
+        if (window.matchMedia('(pointer: coarse)').matches) {
+          const input = document.createElement('input');
+          input.setAttribute('type', 'text');
+          input.style.position = 'absolute';
+          input.style.top = '0';
+          input.style.left = '0';
+          input.style.width = '1px';
+          input.style.height = '1px';
+          input.style.opacity = '0';
+          document.body.appendChild(input);
+          input.focus();
+          input.addEventListener('blur', () => {
+            document.body.removeChild(input);
+          });
+        }
+      }}
       {...props}
     >
       {text?.split('').map((char, index) => {
