@@ -202,21 +202,15 @@ a:focus-visible {
 
 /* ---------- Typography ---------- */
 .heading-xl {
-  font-size: 2.25rem;
+  font-size: clamp(1.5rem, 5vw, 3rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.2;
   color: var(--color-fg);
 }
 
-@media (min-width: 640px) {
-  .heading-xl {
-    font-size: 3rem;
-  }
-}
-
 .text-body {
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 2vw, 1rem);
   line-height: 1.75;
   color: var(--color-fg-muted);
 }
@@ -288,26 +282,19 @@ a:focus-visible {
 
 /* ---------- Hero Grid ---------- */
 .hero-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 4rem 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1rem, 4vw, 4rem);
 }
-
-@media (min-width: 1024px) {
-  .hero-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto 1fr;
-    gap: 3rem 0;
-  }
-
-  .hero-text {
-    order: -1;
-    grid-row: 1 / -1;
-  }
-
-  .hero-image {
-    padding-left: 5rem;
-  }
+.hero-text {
+  flex: 1 1 55%;
+}
+.hero-image {
+  flex: 1 1 45%;
+  display: flex;
+  justify-content: center;
 }
 
 .hero-image-wrap {
@@ -344,13 +331,7 @@ a:focus-visible {
 }
 
 .cta-area {
-  margin-top: 3rem;
-}
-
-@media (min-width: 1024px) {
-  .cta-area {
-    margin-top: 8rem;
-  }
+  margin-top: clamp(1.5rem, 5vw, 8rem);
 }
 
 /* ---------- Memorization Tool ---------- */
@@ -423,23 +404,60 @@ a:focus-visible {
   color: #fff;
 }
 
-.mem-passage {
-  border: 1px solid var(--color-border);
+.mem-passage-container {
+  position: relative;
+  min-height: 10rem;
+  width: 100%;
+}
+
+.mem-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   padding: 1rem;
-  border-radius: var(--radius-md);
-  outline: none;
   font-size: 1rem;
   line-height: 1.75;
-  min-height: 10rem;
-  cursor: text;
+  font-family: var(--font-sans);
+  background: transparent;
+  color: transparent;
+  caret-color: var(--color-accent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  resize: none;
+  overflow-y: hidden;
   white-space: pre-wrap;
   word-wrap: break-word;
+  outline: none;
+  z-index: 2;
   transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
 }
 
-.mem-passage:focus {
+.mem-input:focus {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.mem-input::placeholder {
+  color: var(--color-fg-subtle);
+  opacity: 1;
+}
+
+.mem-passage {
+  width: 100%;
+  min-height: 10rem;
+  padding: 1rem;
+  font-size: 1rem;
+  line-height: 1.75;
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-card);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .char-correct {
@@ -457,7 +475,13 @@ a:focus-visible {
 }
 
 .char-blank {
-  opacity: 0;
+  color: transparent;
+  border-bottom: 2px solid var(--color-fg-subtle);
+  margin-right: 1px;
+}
+
+.char-blank-space {
+  color: transparent;
 }
 
 /* ---------- 404 ---------- */

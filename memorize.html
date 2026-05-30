@@ -12,8 +12,8 @@
 <body>
 
     <div id="main-content">
-        <div class="container-outer" style="margin-top: 4rem;">
-            <div class="container-inner-wrap">
+        <div class="container-outer" style="display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding-top: 2rem; padding-bottom: 2rem;">
+            <div class="container-inner-wrap" style="width: 100%;">
                 <div class="container-inner">
                     <div class="container-content">
 
@@ -60,16 +60,24 @@
                                 <button class="mem-mode-btn" data-mode="full">Full</button>
                             </div>
 
-                            <!-- Passage area -->
-                            <div
-                                id="mem-passage"
-                                class="mem-passage"
-                                tabindex="0"
-                                role="textbox"
-                                inputmode="text"
-                                title="Try to type the text from memory here"
-                            ></div>
-                        </div>
+                             <!-- Passage area -->
+                             <div class="mem-passage-container">
+                                 <textarea
+                                     id="mem-input"
+                                     class="mem-input"
+                                     title="Try to type the text from memory here"
+                                     autocomplete="off"
+                                     autocorrect="off"
+                                     autocapitalize="off"
+                                     spellcheck="false"
+                                 ></textarea>
+                                 <div
+                                     id="mem-passage"
+                                     class="mem-passage"
+                                     aria-hidden="true"
+                                 ></div>
+                             </div>
+                         </div>
 
                     </div>
                 </div>

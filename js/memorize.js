@@ -31,12 +31,13 @@
 
   // ——— DOM refs ———
   const sourceInput   = document.getElementById('mem-source');
+  const inputEl       = document.getElementById('mem-input');
   const passageEl     = document.getElementById('mem-passage');
   const caseCb        = document.getElementById('case-sensitive');
   const puncCb        = document.getElementById('check-punctuation');
   const modeBtns      = document.querySelectorAll('.mem-mode-btn');
 
-  if (!sourceInput || !passageEl) return; // guard if DOM isn't ready
+  if (!sourceInput || !passageEl || !inputEl) return; // guard if DOM isn't ready
 
   // ——— Init checkboxes from persisted state ———
   caseCb.checked = caseSensitive.get();
@@ -50,6 +51,19 @@
       .replace(/\s{2,}/g, ' ')
       .replace(/^\s+|\s+$/g, ' ');
     typedText = '';
+    inputEl.value = '';
+    render();
+  });
+
+  inputEl.addEventListener('input', () => {
+    // Restrict typed text length to clean source text length
+    const { cleanText } = computeClean();
+    let currentInput = inputEl.value;
+    if (currentInput.length > cleanText.length) {
+      currentInput = currentInput.slice(0, cleanText.length);
+      inputEl.value = currentInput;
+    }
+    typedText = currentInput;
     render();
   });
 
@@ -61,6 +75,7 @@
   puncCb.addEventListener('change', () => {
     checkPunctuation.set(puncCb.checked);
     typedText = '';
+    inputEl.value = '';
     render();
   });
 
@@ -72,40 +87,6 @@
       render();
     });
   });
-
-  passageEl.addEventListener('keydown', handleKey);
-
-  // Mobile keyboard support
-  passageEl.addEventListener('touchstart', () => {
-    if (window.matchMedia('(pointer: coarse)').matches) {
-      const inp = document.createElement('input');
-      inp.type = 'text';
-      Object.assign(inp.style, { position:'absolute', top:'0', left:'0', width:'1px', height:'1px', opacity:'0' });
-      document.body.appendChild(inp);
-      inp.focus();
-      inp.addEventListener('blur', () => document.body.removeChild(inp));
-    }
-  });
-
-  // ——— Key handler ———
-  function handleKey(e) {
-    if (e.key === ' ') e.preventDefault(); // prevent scroll
-
-    // Prevent duplicate trailing spaces
-    if (e.key === ' ' && typedText.endsWith(' ')) return;
-
-    if (e.key === 'Backspace') {
-      typedText = typedText.slice(0, -1);
-    } else if (e.key.length === 1) {
-      const { cleanText } = computeClean();
-      if (typedText.length < cleanText.length) {
-        typedText += e.key;
-      }
-    } else {
-      return; // ignore meta keys
-    }
-    render();
-  }
 
   // ——— Derived computations ———
   const PUNC_REGEX = /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/;
@@ -155,7 +136,9 @@
   // ——— Render ———
   function render() {
     if (!sourceText) {
-      passageEl.innerHTML = '<span style="color: var(--color-fg-subtle)">Paste source text above, then click here and start typing from memory…</span>';
+      passageEl.innerHTML = '<span style="color: var(--color-fg-subtle)">Paste source text above, then type here from memory…</span>';
+      inputEl.style.height = '10rem';
+      passageEl.style.height = '10rem';
       return;
     }
 
@@ -192,13 +175,23 @@
         if (visibilityMap[i]) {
           spans.push(`<span>${escapeHtml(ch)}</span>`);
         } else {
-          // Hidden character — show a non-breaking space to preserve layout
-          spans.push(`<span class="char-blank">${escapeHtml(ch)}</span>`);
+          if (ch === ' ') {
+            spans.push(`<span class="char-blank-space">&nbsp;</span>`);
+          } else {
+            spans.push(`<span class="char-blank">${escapeHtml(ch)}</span>`);
+          }
         }
       }
     }
 
     passageEl.innerHTML = spans.join('');
+
+    // Dynamically adjust heights to match scroll height of backdrop
+    requestAnimationFrame(() => {
+      const height = Math.max(160, passageEl.scrollHeight);
+      inputEl.style.height = height + 'px';
+      passageEl.style.height = height + 'px';
+    });
   }
 
   // ——— Helpers ———
