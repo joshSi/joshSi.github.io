@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memorization Tool — Josh Si</title>
+    <meta name="description" content="A memorization practice tool. Paste any text, then type it back from memory with real-time feedback.">
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div id="main-content">
+        <div class="container-outer" style="display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding-top: 2rem; padding-bottom: 2rem;">
+            <div class="container-inner-wrap" style="width: 100%;">
+                <div class="container-inner">
+                    <div class="container-content">
+
+                        <a href="/"
+                           class="btn btn-secondary fade-in"
+                           hx-get="/"
+                           hx-target="#main-content"
+                           hx-select="#main-content > *"
+                           hx-swap="innerHTML transition:true"
+                           hx-push-url="true">← Back</a>
+
+                        <div id="memorize-app" class="fade-in fade-in-delay-1" style="margin-top: 2rem;">
+                            <!-- Source input -->
+                            <div class="mb-4">
+                                <label for="mem-source" style="display: block; font-size: 0.875rem; font-weight: 700; color: var(--color-fg-muted); margin-bottom: 0.5rem;">
+                                    Source
+                                </label>
+                                <input
+                                    id="mem-source"
+                                    type="password"
+                                    class="mem-source-input"
+                                    title="Paste the source text here"
+                                    autocomplete="off"
+                                >
+                            </div>
+
+                            <!-- Settings -->
+                            <div class="mem-settings">
+                                <label>
+                                    <input type="checkbox" id="case-sensitive" checked>
+                                    Case Sensitive
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="check-punctuation" checked>
+                                    Punctuation
+                                </label>
+                            </div>
+
+                            <!-- Display mode buttons -->
+                            <div class="mem-controls-row">
+                                <div class="mem-mode-group">
+                                    <button class="mem-mode-btn active" data-mode="hidden">Hidden</button>
+                                    <button class="mem-mode-btn" data-mode="firstLetter">First Letter</button>
+                                    <button class="mem-mode-btn" data-mode="everyOther">Every Other</button>
+                                    <button class="mem-mode-btn" data-mode="full">Full</button>
+                                </div>
+                                <button id="mem-reset" class="btn btn-reset" style="display: none;">Reset</button>
+                            </div>
+
+                             <!-- Passage area -->
+                             <div class="mem-passage-container">
+                                 <textarea
+                                     id="mem-input"
+                                     class="mem-input"
+                                     title="Try to type the text from memory here"
+                                     autocomplete="off"
+                                     autocorrect="off"
+                                     autocapitalize="off"
+                                     spellcheck="false"
+                                 ></textarea>
+                                 <div
+                                     id="mem-passage"
+                                     class="mem-passage"
+                                     aria-hidden="true"
+                                 ></div>
+                             </div>
+                         </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/memorize.js"></script>
+</body>
+</html>

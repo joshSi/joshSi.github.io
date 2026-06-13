@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — Page Not Found</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div id="main-content">
+        <div class="container-outer">
+            <div class="container-inner-wrap">
+                <div class="container-inner">
+                    <div class="container-content">
+
+                        <div class="not-found fade-in">
+                            <img src="/assets/spin.gif" alt="404" width="64" height="64" style="margin-bottom: 1rem;">
+                            <p class="code">404</p>
+                            <h1>Page not found</h1>
+                            <p class="desc">Sorry, we couldn't find the page you're looking for.</p>
+                            <a href="/" class="btn btn-secondary mt-4"
+                               hx-get="/"
+                               hx-target="#main-content"
+                               hx-select="#main-content > *"
+                               hx-swap="innerHTML transition:true"
+                               hx-push-url="true">Go back home</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
