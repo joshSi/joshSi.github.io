@@ -28,6 +28,7 @@
 
   let sourceText = '';
   let typedText  = '';
+  let locked     = false; // true once the user starts typing
 
   // ——— DOM refs ———
   const sourceInput   = document.getElementById('mem-source');
@@ -36,6 +37,7 @@
   const caseCb        = document.getElementById('case-sensitive');
   const puncCb        = document.getElementById('check-punctuation');
   const modeBtns      = document.querySelectorAll('.mem-mode-btn');
+  const resetBtn      = document.getElementById('mem-reset');
 
   if (!sourceInput || !passageEl || !inputEl) return; // guard if DOM isn't ready
 
@@ -43,6 +45,29 @@
   caseCb.checked = caseSensitive.get();
   puncCb.checked = checkPunctuation.get();
   setActiveMode(displayModeSt.get());
+
+  // ——— Lock / Unlock settings ———
+  function lockSettings() {
+    if (locked) return;
+    locked = true;
+    caseCb.disabled = true;
+    puncCb.disabled = true;
+    modeBtns.forEach(b => b.disabled = true);
+    // Visual: dim the parent containers
+    caseCb.closest('.mem-settings')?.classList.add('mem-locked');
+    modeBtns[0]?.closest('.mem-mode-group')?.classList.add('mem-locked');
+    if (resetBtn) resetBtn.style.display = '';
+  }
+
+  function unlockSettings() {
+    locked = false;
+    caseCb.disabled = false;
+    puncCb.disabled = false;
+    modeBtns.forEach(b => b.disabled = false);
+    caseCb.closest('.mem-settings')?.classList.remove('mem-locked');
+    modeBtns[0]?.closest('.mem-mode-group')?.classList.remove('mem-locked');
+    if (resetBtn) resetBtn.style.display = 'none';
+  }
 
   // ——— Event listeners ———
   sourceInput.addEventListener('input', () => {
@@ -52,6 +77,7 @@
       .replace(/^\s+|\s+$/g, ' ');
     typedText = '';
     inputEl.value = '';
+    unlockSettings();
     render();
   });
 
@@ -64,29 +90,49 @@
       inputEl.value = currentInput;
     }
     typedText = currentInput;
+
+    // Lock settings on first character typed; unlock if all deleted
+    if (typedText.length > 0 && !locked) {
+      lockSettings();
+    } else if (typedText.length === 0 && locked) {
+      unlockSettings();
+    }
+
     render();
   });
 
   caseCb.addEventListener('change', () => {
+    if (locked) return; // shouldn't happen, but guard
     caseSensitive.set(caseCb.checked);
     render();
   });
 
   puncCb.addEventListener('change', () => {
+    if (locked) return;
     checkPunctuation.set(puncCb.checked);
-    typedText = '';
-    inputEl.value = '';
     render();
   });
 
   modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
+      if (locked) return;
       const mode = btn.dataset.mode;
       displayModeSt.set(mode);
       setActiveMode(mode);
       render();
     });
   });
+
+  // Reset button
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      typedText = '';
+      inputEl.value = '';
+      unlockSettings();
+      render();
+      inputEl.focus();
+    });
+  }
 
   // ——— Derived computations ———
   const PUNC_REGEX = /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/;
