@@ -7,11 +7,15 @@ Personal portfolio and tools site. Static HTML + [HTMX](https://htmx.org/) — n
 ```
 index.html        — Homepage / portfolio
 memorize.html     — Memorization practice tool
+groups.html       — Group Maker (balanced groups, backed by groups.joshsi.com)
 404.html          — Custom 404 page
 css/style.css     — Design system
 js/memorize.js    — Memorization tool logic
+js/groups.js      — Group Maker client (talks to the balanced_groups API)
 assets/           — Images & favicon
 htmx_quiz_app.html — HTMX real-time quiz app
+robots.txt        — Crawler policy + sitemap pointer
+sitemap.xml       — Sitemap for the static pages
 CNAME             — Custom domain config
 ```
 

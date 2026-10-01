@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Maker — Josh Si</title>
+    <meta name="description" content="Split a roster into balanced groups round after round, maximising new pairings. Backed by the balanced_groups Zig library.">
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div id="main-content">
+        <div class="container-outer site-nav-outer">
+            <div class="container-inner-wrap">
+                <div class="container-inner">
+                    <div class="container-content">
+                        <nav class="site-nav fade-in" aria-label="Primary">
+                        <a href="/" class="site-nav-brand" hx-get="/" hx-target="#main-content" hx-select="#main-content > *" hx-swap="innerHTML transition:true" hx-push-url="true">Josh Si</a>
+                        <div class="site-nav-links">
+                            <a href="/memorize.html" hx-get="/memorize.html" hx-target="#main-content" hx-select="#main-content > *" hx-swap="innerHTML transition:true" hx-push-url="true">Memorize</a>
+                            <a href="/groups.html" hx-get="/groups.html" hx-target="#main-content" hx-select="#main-content > *" hx-swap="innerHTML transition:true" hx-push-url="true" aria-current="page">Groups</a>
+                            <a href="https://quizi.joshsi.com" target="_blank" rel="noopener noreferrer">Quizi<span class="site-nav-ext" aria-hidden="true">↗</span></a>
+                            <a href="https://git.joshsi.com" target="_blank" rel="noopener noreferrer">Git<span class="site-nav-ext" aria-hidden="true">↗</span></a>
+                        </div>
+                    </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-outer" style="padding-top: 1rem; padding-bottom: 4rem;">
+            <div class="container-inner-wrap" style="width: 100%;">
+                <div class="container-inner">
+                    <div class="container-content">
+
+                        <div id="groups-app" class="fade-in fade-in-delay-1">
+
+                            <header class="gm-header">
+                                <div>
+                                    <h1 class="gm-title">Group Maker</h1>
+                                    <p class="text-body" style="margin-top: 0.5rem; max-width: 40rem;">
+                                        Each round splits everyone into groups that minimise repeat
+                                        pairings. Familiarity builds up over time and is saved on the
+                                        server, so the next round always favours people who haven't met.
+                                    </p>
+                                </div>
+                                <div class="gm-header-actions">
+                                    <button id="gm-refresh" class="btn btn-secondary" type="button" title="Reload from server">Refresh</button>
+                                    <button id="gm-unlock" class="btn btn-primary" type="button">Unlock editing</button>
+                                </div>
+                            </header>
+
+                            <p id="gm-status" class="gm-status" role="status" aria-live="polite"></p>
+
+                            <!-- Members -->
+                            <section class="gm-card">
+                                <div class="gm-card-head">
+                                    <h2 class="gm-card-title">Members <span id="gm-member-count" class="gm-pill">0</span></h2>
+                                </div>
+                                <div id="gm-members" class="gm-chips"></div>
+                                <form id="gm-add-form" class="gm-add-row gm-editor" autocomplete="off">
+                                    <input id="gm-add-name" class="gm-input" type="text" maxlength="64"
+                                           placeholder="Add a name…" aria-label="Member name" required>
+                                    <button class="btn btn-primary" type="submit">Add</button>
+                                </form>
+                            </section>
+
+                            <!-- Make a round -->
+                            <section class="gm-card gm-editor">
+                                <div class="gm-card-head">
+                                    <h2 class="gm-card-title">New round</h2>
+                                </div>
+                                <form id="gm-round-form" class="gm-round-row">
+                                    <label class="gm-field">
+                                        <span>Number of groups</span>
+                                        <input id="gm-group-count" class="gm-input gm-input-sm" type="number" min="1" value="2" required>
+                                    </label>
+                                    <span id="gm-size-hint" class="gm-hint"></span>
+                                    <div class="gm-round-actions">
+                                        <button class="btn btn-primary" type="submit">Make groups</button>
+                                        <button id="gm-undo" class="btn btn-secondary" type="button">Undo last round</button>
+                                    </div>
+                                </form>
+                            </section>
+
+                            <!-- Latest round -->
+                            <section class="gm-card">
+                                <div class="gm-card-head">
+                                    <h2 class="gm-card-title">Latest round <span id="gm-round-number" class="gm-pill"></span></h2>
+                                </div>
+                                <div id="gm-latest" class="gm-groups"></div>
+                            </section>
+
+                            <!-- Familiarity -->
+                            <section class="gm-card">
+                                <div class="gm-card-head">
+                                    <h2 class="gm-card-title">Familiarity</h2>
+                                    <span class="gm-hint">Times each pair has shared a group</span>
+                                </div>
+                                <div id="gm-matrix" class="gm-matrix-wrap"></div>
+                            </section>
+
+                            <!-- History -->
+                            <details class="gm-card gm-history">
+                                <summary class="gm-card-title">Round history <span id="gm-history-count" class="gm-pill">0</span></summary>
+                                <div id="gm-history" class="gm-history-list"></div>
+                            </details>
+
+                            <p class="gm-footnote">
+                                Powered by <a href="https://github.com/joshSi/balanced_groups" target="_blank" rel="noopener noreferrer">balanced_groups</a>,
+                                a Zig solver for the social golfer problem.
+                            </p>
+                        </div>
+
+                        <script src="/js/groups.js"></script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

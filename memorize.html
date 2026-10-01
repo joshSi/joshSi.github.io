@@ -12,20 +12,29 @@
 <body>
 
     <div id="main-content">
-        <div class="container-outer" style="display: flex; align-items: center; justify-content: center; min-height: 100dvh; padding-top: 2rem; padding-bottom: 2rem;">
+        <div class="container-outer site-nav-outer">
+            <div class="container-inner-wrap">
+                <div class="container-inner">
+                    <div class="container-content">
+                        <nav class="site-nav fade-in" aria-label="Primary">
+                        <a href="/" class="site-nav-brand" hx-get="/" hx-target="#main-content" hx-select="#main-content > *" hx-swap="innerHTML transition:true" hx-push-url="true">Josh Si</a>
+                        <div class="site-nav-links">
+                            <a href="/memorize.html" hx-get="/memorize.html" hx-target="#main-content" hx-select="#main-content > *" hx-swap="innerHTML transition:true" hx-push-url="true" aria-current="page">Memorize</a>
+                            <a href="/groups.html" hx-get="/groups.html" hx-target="#main-content" hx-select="#main-content > *" hx-swap="innerHTML transition:true" hx-push-url="true">Groups</a>
+                            <a href="https://quizi.joshsi.com" target="_blank" rel="noopener noreferrer">Quizi<span class="site-nav-ext" aria-hidden="true">↗</span></a>
+                            <a href="https://git.joshsi.com" target="_blank" rel="noopener noreferrer">Git<span class="site-nav-ext" aria-hidden="true">↗</span></a>
+                        </div>
+                    </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-outer" style="display: flex; align-items: center; justify-content: center; min-height: calc(100dvh - var(--site-nav-height)); padding-top: 1rem; padding-bottom: 2rem;">
             <div class="container-inner-wrap" style="width: 100%;">
                 <div class="container-inner">
                     <div class="container-content">
 
-                        <a href="/"
-                           class="btn btn-secondary fade-in"
-                           hx-get="/"
-                           hx-target="#main-content"
-                           hx-select="#main-content > *"
-                           hx-swap="innerHTML transition:true"
-                           hx-push-url="true">← Back</a>
-
-                        <div id="memorize-app" class="fade-in fade-in-delay-1" style="margin-top: 2rem;">
+                        <div id="memorize-app" class="fade-in fade-in-delay-1">
                             <!-- Source input -->
                             <div class="mb-4">
                                 <label for="mem-source" style="display: block; font-size: 0.875rem; font-weight: 700; color: var(--color-fg-muted); margin-bottom: 0.5rem;">
