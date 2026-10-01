@@ -30,4 +30,4 @@ python3 -m http.server 8000
 
 ## Deployment
 
-Deployed via GitHub Pages. Push to `main` and it's live at [joshsi.com](https://joshsi.com).
+Deployed via Cloudflare Pages. Push to `master` and it's live at [joshsi.com](https://joshsi.com).
