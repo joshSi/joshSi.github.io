@@ -47,11 +47,33 @@
                                 </div>
                                 <div class="gm-header-actions">
                                     <button id="gm-refresh" class="btn btn-secondary" type="button" title="Reload from server">Refresh</button>
-                                    <button id="gm-unlock" class="btn btn-primary" type="button">Unlock editing</button>
+                                    <button id="gm-unlock" class="btn btn-primary" type="button">Edit</button>
                                 </div>
                             </header>
 
                             <p id="gm-status" class="gm-status" role="status" aria-live="polite"></p>
+
+                            <!-- Passcode panel (shown when the user clicks Edit) -->
+                            <section id="gm-unlock-panel" class="gm-card gm-unlock-panel" hidden>
+                                <h2 class="gm-card-title">Enter the organiser passcode</h2>
+                                <p class="gm-unlock-text">
+                                    Anyone can view the groups, but changing the roster or making new
+                                    rounds is reserved for the organiser. If you're meant to run this,
+                                    ask Josh for the passcode. It stays saved on this device until you
+                                    choose <em>Done editing</em>.
+                                </p>
+                                <form id="gm-unlock-form" class="gm-add-row" autocomplete="off">
+                                    <input id="gm-passcode" class="gm-input" type="password" placeholder="Passcode"
+                                           aria-label="Organiser passcode" autocomplete="current-password" required>
+                                    <button class="btn btn-primary" type="submit">Unlock</button>
+                                    <button id="gm-unlock-cancel" class="btn btn-secondary" type="button">Cancel</button>
+                                </form>
+                                <p id="gm-unlock-error" class="gm-status gm-status-error" role="alert" style="margin-top: 0.5rem;"></p>
+                            </section>
+
+                            <p class="gm-viewer gm-hint" style="margin-top: 0.75rem;">
+                                You're viewing. Click <strong>Edit</strong> to add people or make groups.
+                            </p>
 
                             <!-- Members -->
                             <section class="gm-card">
@@ -82,6 +104,24 @@
                                         <button id="gm-undo" class="btn btn-secondary" type="button">Undo last round</button>
                                     </div>
                                 </form>
+
+                                <details id="gm-manual" class="gm-manual">
+                                    <summary>Record a round that already happened</summary>
+                                    <p class="gm-hint" style="margin-top: 0.5rem;">
+                                        Used to catch up on groups formed before this tool, so the
+                                        solver knows who has already met. One group per line, names
+                                        separated by commas. People not on the roster yet will be
+                                        added after you confirm.
+                                    </p>
+                                    <form id="gm-manual-form" style="margin-top: 0.75rem;">
+                                        <textarea id="gm-manual-text" class="gm-input gm-textarea" rows="4"
+                                                  placeholder="Alice, Bob, Charlie&#10;David, Eve&#10;Frank, Grace, Harry"
+                                                  aria-label="Groups, one per line" spellcheck="false"></textarea>
+                                        <div class="gm-round-actions" style="margin-top: 0.75rem; margin-left: 0;">
+                                            <button class="btn btn-primary" type="submit">Record round</button>
+                                        </div>
+                                    </form>
+                                </details>
                             </section>
 
                             <!-- Latest round -->

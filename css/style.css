@@ -930,9 +930,65 @@ a:focus-visible {
   border-radius: var(--radius-sm);
 }
 
+/* Passcode panel */
+.gm-unlock-panel {
+  border-color: var(--color-accent-muted);
+}
+
+.gm-unlock-text {
+  margin: 0.5rem 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-fg-muted);
+  max-width: 40rem;
+}
+
+.gm-unlock-text em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--color-fg);
+}
+
+.gm-status:empty {
+  display: none;
+}
+
+/* Manual round */
+.gm-manual {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.gm-manual summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-fg-muted);
+}
+
+.gm-manual summary:hover {
+  color: var(--color-fg);
+}
+
+.gm-textarea {
+  display: block;
+  width: 100%;
+  resize: vertical;
+  line-height: 1.6;
+}
+
 /* Modes */
 .gm-readonly .gm-editor {
   display: none;
+}
+
+.gm-viewer {
+  display: none;
+}
+
+.gm-readonly .gm-viewer {
+  display: block;
 }
 
 .gm-busy button,
