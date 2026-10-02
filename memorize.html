@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memorization Tool — Josh Si</title>
-    <meta name="description" content="A memorization practice tool. Paste any text, then type it back from memory with real-time feedback.">
+    <meta name="description" content="A memorization practice tool. Paste any text, then type it back from memory with real-time feedback. Passages are saved in your browser and can be shared by link.">
     <link rel="icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
@@ -49,6 +49,26 @@
                                 >
                             </div>
 
+                            <!-- Saved passages & sharing. Everything is kept in this browser's
+                                 localStorage; share links carry the passage in the URL fragment. -->
+                            <div class="mem-session-bar">
+                                <input id="mem-title" class="mem-field mem-title" type="text" maxlength="80"
+                                       placeholder="Title (optional)" aria-label="Passage title"
+                                       autocomplete="off" hidden>
+                                <select id="mem-saved" class="mem-field mem-select" aria-label="Saved passages" hidden></select>
+                                <div class="mem-session-actions">
+                                    <button id="mem-copy-link" class="btn btn-secondary" type="button"
+                                            title="Copy a link that opens this passage" disabled>Copy link</button>
+                                    <button id="mem-new" class="btn btn-secondary" type="button"
+                                            title="Start a new passage (this one stays saved)" hidden>New</button>
+                                    <button id="mem-delete" class="btn btn-secondary mem-btn-danger" type="button"
+                                            title="Delete this passage from this browser" hidden>Delete</button>
+                                </div>
+                            </div>
+                            <input id="mem-share-url" class="mem-field mem-share-url" type="text" readonly
+                                   aria-label="Share link" hidden>
+                            <p id="mem-status" class="mem-status" role="status" aria-live="polite"></p>
+
                             <!-- Settings -->
                             <div class="mem-settings">
                                 <label>
@@ -91,12 +111,12 @@
                              </div>
                          </div>
 
+                        <script src="/js/memorize.js"></script>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="/js/memorize.js"></script>
 </body>
 </html>
