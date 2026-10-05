@@ -1,9 +1,13 @@
 /**
  * Group Maker — Vanilla JS client for the balanced_groups API.
  *
- * Anyone can view. Editing (roster changes, new rounds) needs the organiser
- * passcode, which the API knows as its bearer token. Once entered it is kept
- * in localStorage so the organiser stays unlocked on that device.
+ * Anyone can view a group system by its link, and anyone can create one: the
+ * server hands back a passcode that is the bearer token for every change to
+ * that system. Passcodes are kept in localStorage per system so the organiser
+ * stays unlocked on that device. Josh's admin key (also stored locally) edits
+ * every system and lists them all.
+ *
+ * `?g=<id>` picks a system; without it the server's first system is shown.
  *
  * The script is idempotent so it can run again after an HTMX page swap.
  * Point it at a different server for local testing:
@@ -14,7 +18,9 @@
   'use strict';
 
   var DEFAULT_API = 'https://groups.joshsi.com';
-  var KEY_STORAGE = 'bg-api-key';
+  var KEY_STORAGE = 'bg-api-key';      // admin key
+  var SYS_KEY_PREFIX = 'bg-sys-key:';   // + system id → that system's passcode
+  var MINE_STORAGE = 'bg-mine';         // [{id, name}] systems this device has a passcode for
   var API_STORAGE = 'bg-api-base';
 
   var root = document.getElementById('groups-app');
@@ -28,9 +34,25 @@
     api = api || localStorage.getItem(API_STORAGE) || DEFAULT_API;
   } catch (_) { api = api || DEFAULT_API; }
   api = api.replace(/\/+$/, '');
+  var systemId = params.get('g') || '';
 
-  function getKey() { try { return localStorage.getItem(KEY_STORAGE) || ''; } catch (_) { return ''; } }
-  function setKey(k) { try { k ? localStorage.setItem(KEY_STORAGE, k) : localStorage.removeItem(KEY_STORAGE); } catch (_) {} }
+  function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (_) { return ''; } }
+  function lsSet(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (_) {} }
+  function getAdminKey() { return lsGet(KEY_STORAGE); }
+  function setAdminKey(k) { lsSet(KEY_STORAGE, k); }
+  function getSysKey(id) { return id ? lsGet(SYS_KEY_PREFIX + id) : ''; }
+  function setSysKey(id, k) { if (id) lsSet(SYS_KEY_PREFIX + id, k); }
+  /** The credential to use for the current system: admin key first, else its passcode. */
+  function getKey() { return getAdminKey() || getSysKey(systemId); }
+  function isAdmin() { return !!getAdminKey(); }
+  function getMine() { try { return JSON.parse(lsGet(MINE_STORAGE) || '[]'); } catch (_) { return []; } }
+  function setMine(list) { lsSet(MINE_STORAGE, list.length ? JSON.stringify(list) : ''); }
+  function rememberMine(id, name) {
+    var list = getMine().filter(function (m) { return m.id !== id; });
+    list.unshift({ id: id, name: name });
+    setMine(list.slice(0, 50));
+  }
+  function forgetMine(id) { setMine(getMine().filter(function (m) { return m.id !== id; })); setSysKey(id, ''); }
 
   // ——— DOM ———
   var $ = function (id) { return document.getElementById(id); };
@@ -58,8 +80,28 @@
   var matrixEl     = $('gm-matrix');
   var historyEl    = $('gm-history');
   var historyCount = $('gm-history-count');
+  var systemName   = $('gm-system-name');
+  var systemSelect = $('gm-system-select');
+  var systemNew    = $('gm-system-new');
+  var systemRename = $('gm-system-rename');
+  var systemDelete = $('gm-system-delete');
+  var systemCopy   = $('gm-system-copy');
+  var systemPass   = $('gm-system-passcode');
+  var createBtns   = Array.prototype.slice.call(document.querySelectorAll('.gm-system-create'));
+  var createPanel  = $('gm-create-panel');
+  var createForm   = $('gm-create-form');
+  var createName   = $('gm-create-name');
+  var createPass   = $('gm-create-passcode');
+  var createCancel = $('gm-create-cancel');
+  var createError  = $('gm-create-error');
+  var revealPanel  = $('gm-reveal-panel');
+  var revealName   = $('gm-reveal-name');
+  var revealCode   = $('gm-reveal-code');
+  var revealCopy   = $('gm-reveal-copy');
+  var revealClose  = $('gm-reveal-close');
 
-  var state = { members: [], familiarity: [], history: [], rounds: 0 };
+  var state = { system: null, members: [], familiarity: [], history: [], rounds: 0, can_edit: false, locked: false };
+  var systems = []; // [{id, name, members, rounds, locked}], only known to the admin
   var lastRound = null; // groups from the most recent action
   var busy = false;
 
@@ -90,9 +132,28 @@
   function applyEditMode() {
     var on = editing();
     root.classList.toggle('gm-readonly', !on);
+    root.classList.toggle('gm-admin', isAdmin());
     unlockBtn.textContent = on ? 'Done editing' : 'Edit';
     unlockBtn.className = 'btn ' + (on ? 'btn-secondary' : 'btn-primary');
     if (on) hideUnlockPanel();
+  }
+
+  function showCreatePanel() {
+    createPanel.hidden = false;
+    createError.textContent = '';
+    createName.value = '';
+    createPass.value = '';
+    hideUnlockPanel();
+    try { createName.focus(); } catch (_) {}
+  }
+  function hideCreatePanel() { createPanel.hidden = true; createError.textContent = ''; }
+
+  /** Show a freshly issued passcode once, with a copy button. */
+  function revealPasscode(name, code) {
+    revealName.textContent = name;
+    revealCode.textContent = code;
+    revealPanel.hidden = false;
+    try { revealPanel.scrollIntoView({ block: 'nearest' }); } catch (_) {}
   }
 
   function showUnlockPanel() {
@@ -108,12 +169,29 @@
     passcodeEl.value = '';
   }
 
+  /** Path for an endpoint that acts on the current group system. */
+  function sys(path) {
+    return systemId ? path + '?system=' + encodeURIComponent(systemId) : path;
+  }
+
+  function shareLink(id) {
+    return location.origin + location.pathname + '?g=' + encodeURIComponent(id);
+  }
+
+  /** Show `id` in the address bar so the page can be bookmarked or shared. */
+  function setUrlSystem(id) {
+    var url = new URL(location.href);
+    if (id) url.searchParams.set('g', id); else url.searchParams.delete('g');
+    try { history.replaceState(history.state, '', url.toString()); } catch (_) {}
+  }
+
   // ——— API ———
   function request(method, path, body) {
     var headers = { 'Accept': 'application/json' };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     var key = getKey();
-    if (method !== 'GET' && key) headers['Authorization'] = 'Bearer ' + key;
+    // Reads are public, but sending the key with /api/state tells us whether it may edit.
+    if (key) headers['Authorization'] = 'Bearer ' + key;
 
     return fetch(api + path, {
       method: method,
@@ -139,14 +217,52 @@
   function load() {
     setBusy(true);
     setStatus('Loading…');
-    return request('GET', '/api/state').then(function (s) {
+    return request('GET', sys('/api/state')).then(function (s) {
       state = s;
       lastRound = s.history.length ? s.history[s.history.length - 1] : null;
       setStatus('');
+      // A stored passcode that no longer opens this system is dropped quietly.
+      if (!isAdmin() && getSysKey(s.system.id) && !s.can_edit) {
+        forgetMine(s.system.id);
+        setStatus('The passcode saved for ' + s.system.name + ' no longer works.', 'error');
+      }
+      if (s.can_edit && !isAdmin()) rememberMine(s.system.id, s.system.name);
+      applyEditMode();
       renderAll();
     }).catch(function (err) {
-      setStatus('Could not reach the server at ' + api + ' (' + err.message + ')', 'error');
+      if (err.status === 404 && systemId) {
+        state = { system: null, members: [], familiarity: [], history: [], rounds: 0 };
+        lastRound = null;
+        renderAll();
+        setStatus("This link points to a group system that doesn't exist any more.", 'error');
+      } else {
+        setStatus('Could not reach the server at ' + api + ' (' + err.message + ')', 'error');
+      }
     }).finally(function () { setBusy(false); });
+  }
+
+  /** Refresh the admin's list of every group system. */
+  function loadSystems() {
+    if (!isAdmin()) return Promise.resolve();
+    return request('GET', '/api/systems').then(function (data) {
+      systems = data.systems || [];
+      renderSystems();
+    }).catch(function (err) {
+      if (err.status === 401) lockAfterBadKey();
+    });
+  }
+
+  function switchSystem(id) {
+    systemId = id;
+    setUrlSystem(id);
+    return load();
+  }
+
+  function lockAfterBadKey() {
+    if (isAdmin()) { setAdminKey(''); systems = []; } else forgetMine(systemId || (state.system && state.system.id));
+    applyEditMode();
+    renderAll();
+    setStatus('The saved passcode no longer works. Click Edit to enter it again.', 'error');
   }
 
   /**
@@ -168,10 +284,7 @@
       return data;
     }).catch(function (err) {
       if (err.status === 401) {
-        setKey('');
-        applyEditMode();
-        renderAll();
-        setStatus('The saved passcode no longer works. Click Edit to enter it again.', 'error');
+        lockAfterBadKey();
       } else if (!(opts.onError && opts.onError(err))) {
         setStatus(err.message, 'error');
       }
@@ -180,11 +293,30 @@
 
   // ——— Rendering ———
   function renderAll() {
+    renderSystems();
     renderMembers();
     renderRoundControls();
     renderLatest();
     renderMatrix();
     renderHistory();
+  }
+
+  function renderSystems() {
+    var current = state.system;
+    systemName.textContent = current ? current.name : '';
+    if (current) document.title = current.name + ' — Group Maker — Josh Si';
+
+    var list = isAdmin() ? systems.slice() : getMine();
+    if (current && !list.some(function (s) { return s.id === current.id; })) {
+      list.unshift({ id: current.id, name: current.name });
+    }
+    systemSelect.innerHTML = list.map(function (s) {
+      var count = current && s.id === current.id ? state.members.length : s.members;
+      var detail = count === undefined ? '' : ' (' + count + (count === 1 ? ' person' : ' people') + ')';
+      return '<option value="' + esc(s.id) + '">' + esc(s.name) + esc(detail) + '</option>';
+    }).join('');
+    if (current) systemSelect.value = current.id;
+    systemDelete.disabled = !current;
   }
 
   function renderMembers() {
@@ -295,7 +427,7 @@
   }
 
   function recordManual(groups, addMissing) {
-    return mutate('POST', '/api/rounds/manual', { groups: groups, add_missing: !!addMissing }, function (data) {
+    return mutate('POST', sys('/api/rounds/manual'), { groups: groups, add_missing: !!addMissing }, function (data) {
       var msg = 'Round ' + state.rounds + ' recorded';
       if (data && data.added && data.added.length) msg += ' and added ' + joinNames(data.added) + ' to the roster';
       return msg + '.';
@@ -321,10 +453,120 @@
     });
   }
 
+  // ——— Group systems ———
+  systemSelect.addEventListener('change', function () {
+    switchSystem(systemSelect.value);
+  });
+
+  createBtns.forEach(function (b) { b.addEventListener('click', function () { if (createPanel.hidden) showCreatePanel(); else hideCreatePanel(); }); });
+  if (systemNew) systemNew.addEventListener('click', showCreatePanel);
+  createCancel.addEventListener('click', hideCreatePanel);
+
+  createForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = createName.value.trim();
+    var pass = createPass.value.trim();
+    if (!name) return;
+    if (pass && pass.length < 8) { createError.textContent = 'A passcode needs at least 8 characters, or leave it blank to get one.'; return; }
+    if (busy) return;
+    setBusy(true);
+    createError.textContent = '';
+    var body = pass ? { name: name, passcode: pass } : { name: name };
+    request('POST', '/api/systems', body).then(function (data) {
+      if (data.systems) systems = data.systems;
+      systemId = data.system.id;
+      setSysKey(systemId, data.passcode);
+      rememberMine(systemId, data.system.name);
+      setUrlSystem(systemId);
+      hideCreatePanel();
+      revealPasscode(data.system.name, data.passcode);
+      applyEditMode();
+      setBusy(false);
+      return load().then(function () {
+        setStatus('Created ' + data.system.name + '. Add people below to get started.', 'ok');
+      });
+    }).catch(function (err) {
+      setBusy(false);
+      createError.textContent = err.status === 429 ? 'Too many new groups were made recently. Please try again in a little while.' : (err.message || 'Could not reach the server.');
+    });
+  });
+
+  systemPass.addEventListener('click', function () {
+    if (!state.system || busy) return;
+    var custom = window.prompt('New passcode for ' + state.system.name + ' (at least 8 characters). Leave blank to have one generated. Anyone with the old passcode will be locked out.', '');
+    if (custom === null) return;
+    custom = custom.trim();
+    if (custom && custom.length < 8) { setStatus('A passcode needs at least 8 characters.', 'error'); return; }
+    setBusy(true);
+    var body = custom ? { id: state.system.id, passcode: custom } : { id: state.system.id };
+    request('POST', '/api/systems/passcode', body).then(function (data) {
+      if (!isAdmin()) setSysKey(data.system.id, data.passcode);
+      revealPasscode(data.system.name, data.passcode);
+      setStatus('Passcode changed.', 'ok');
+    }).catch(function (err) {
+      if (err.status === 401) lockAfterBadKey(); else setStatus(err.message, 'error');
+    }).finally(function () { setBusy(false); });
+  });
+
+  revealClose.addEventListener('click', function () { revealPanel.hidden = true; });
+  revealCopy.addEventListener('click', function () {
+    var code = revealCode.textContent;
+    var done = function () { setStatus('Passcode copied.', 'ok'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(done, function () { window.prompt('Copy this passcode:', code); });
+    else window.prompt('Copy this passcode:', code);
+  });
+
+  systemRename.addEventListener('click', function () {
+    if (!state.system) return;
+    var name = (window.prompt('New name for ' + state.system.name + ':', state.system.name) || '').trim();
+    if (!name || name === state.system.name) return;
+    if (busy) return;
+    setBusy(true);
+    request('POST', '/api/systems/rename', { id: state.system.id, name: name }).then(function (data) {
+      if (data.systems) systems = data.systems;
+      state.system = data.system;
+      if (!isAdmin()) rememberMine(data.system.id, data.system.name);
+      renderSystems();
+      setStatus('Renamed to ' + name + '. Existing links still work.', 'ok');
+    }).catch(function (err) {
+      if (err.status === 401) lockAfterBadKey(); else setStatus(err.message, 'error');
+    }).finally(function () { setBusy(false); });
+  });
+
+  systemDelete.addEventListener('click', function () {
+    var current = state.system;
+    if (!current || busy) return;
+    if (!window.confirm('Delete ' + current.name + '? Its roster, familiarity and every round are erased for good.')) return;
+    setBusy(true);
+    request('POST', '/api/systems/delete', { id: current.id }).then(function (data) {
+      if (data.systems) systems = data.systems;
+      forgetMine(current.id);
+      setBusy(false);
+      var next = isAdmin() ? (systems[0] && systems[0].id) : (getMine()[0] && getMine()[0].id);
+      return switchSystem(next || '').then(function () {
+        setStatus('Deleted ' + current.name + '.', 'ok');
+      });
+    }).catch(function (err) {
+      setBusy(false);
+      if (err.status === 401) lockAfterBadKey(); else setStatus(err.message, 'error');
+    });
+  });
+
+  systemCopy.addEventListener('click', function () {
+    if (!state.system) return;
+    var link = shareLink(state.system.id);
+    var done = function () { setStatus('Link copied. Anyone with it can view ' + state.system.name + '.', 'ok'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link).then(done, function () { window.prompt('Copy this link:', link); });
+    } else {
+      window.prompt('Copy this link:', link);
+    }
+  });
+
   // ——— Events ———
   unlockBtn.addEventListener('click', function () {
     if (editing()) {
-      setKey('');
+      if (isAdmin()) { setAdminKey(''); systems = []; } else setSysKey(systemId || (state.system && state.system.id), '');
       applyEditMode();
       renderAll();
       setStatus('Editing turned off on this device.', 'ok');
@@ -341,18 +583,27 @@
     if (!code) return;
     unlockError.textContent = '';
     setBusy(true);
-    // Verify the passcode before trusting it, with a request that cannot
-    // change anything: an empty name is rejected with 400 only after the
-    // server has accepted the key, while a wrong key is rejected with 401.
-    fetch(api + '/api/members', {
-      method: 'POST',
-      mode: 'cors',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + code },
-      body: JSON.stringify({ name: '' }),
-    }).then(function (res) {
-      if (res.status === 401) throw new Error("That passcode didn't work. Check it and try again.");
-      if (res.status === 503) throw new Error('The server is in read-only mode right now.');
-      setKey(code);
+    // The same box takes the admin key or this group's passcode: try the
+    // admin list first, then ask the current system whether the code may edit it.
+    var h = { 'Accept': 'application/json', 'Authorization': 'Bearer ' + code };
+    fetch(api + '/api/systems', { method: 'GET', mode: 'cors', headers: h }).then(function (res) {
+      if (res.ok) return res.json().then(function (data) {
+        systems = data.systems || [];
+        setAdminKey(code);
+        return 'admin';
+      });
+      if (res.status !== 401 && res.status !== 503) throw new Error('Could not check the passcode (' + res.status + ').');
+      return fetch(api + sys('/api/state'), { method: 'GET', mode: 'cors', headers: h }).then(function (r2) {
+        if (!r2.ok) throw new Error('Could not check the passcode (' + r2.status + ').');
+        return r2.json();
+      }).then(function (st) {
+        if (!st.can_edit) throw new Error(st.locked ? "That passcode doesn't open this group. Check it and try again." : 'This group has no passcode of its own yet; only Josh can edit it.');
+        state = st;
+        setSysKey(st.system.id, code);
+        rememberMine(st.system.id, st.system.name);
+        return 'owner';
+      });
+    }).then(function () {
       applyEditMode();
       renderAll();
       setStatus("You're editing. Changes save instantly and stay on this device until you click Done editing.", 'ok');
@@ -367,7 +618,7 @@
     e.preventDefault();
     var name = addInput.value.trim();
     if (!name) return;
-    mutate('POST', '/api/members', { name: name }, 'Added ' + name + '.').then(function (data) {
+    mutate('POST', sys('/api/members'), { name: name }, 'Added ' + name + '.').then(function (data) {
       if (data) { addInput.value = ''; addInput.focus(); }
     });
   });
@@ -377,7 +628,7 @@
     if (!btn || !editing()) return;
     var name = btn.getAttribute('data-name');
     if (!window.confirm('Remove ' + name + ' from the roster? The record of who they have met is discarded.')) return;
-    mutate('POST', '/api/members/remove', { name: name }, 'Removed ' + name + '.');
+    mutate('POST', sys('/api/members/remove'), { name: name }, 'Removed ' + name + '.');
   });
 
   groupCountEl.addEventListener('input', renderRoundControls);
@@ -386,7 +637,7 @@
     e.preventDefault();
     var g = parseInt(groupCountEl.value, 10);
     if (!g || g < 1) return;
-    mutate('POST', '/api/rounds', { group_count: g }, function () { return 'Round ' + state.rounds + ' created.'; });
+    mutate('POST', sys('/api/rounds'), { group_count: g }, function () { return 'Round ' + state.rounds + ' created.'; });
   });
 
   manualForm.addEventListener('submit', function (e) {
@@ -399,11 +650,12 @@
   undoBtn.addEventListener('click', function () {
     if (!state.rounds) return;
     if (!window.confirm('Undo round ' + state.rounds + '? Those groups will be forgotten.')) return;
-    mutate('POST', '/api/rounds/undo', undefined, 'Last round undone.');
+    mutate('POST', sys('/api/rounds/undo'), undefined, 'Last round undone.');
   });
 
   // ——— Init ———
   applyEditMode();
   renderAll();
   load();
+  loadSystems();
 })();

@@ -51,16 +51,66 @@
                                 </div>
                             </header>
 
+                            <!-- Which group system is shown. Viewers see its name and can
+                                 start their own; whoever holds its passcode can switch between
+                                 theirs, rename, delete, change the passcode. -->
+                            <div class="gm-system">
+                                <div class="gm-system-controls gm-viewer">
+                                    <p id="gm-system-name" class="gm-system-name"></p>
+                                    <button class="btn btn-secondary gm-system-create" type="button">Create your own group</button>
+                                </div>
+                                <div class="gm-system-controls gm-editor">
+                                    <select id="gm-system-select" class="gm-input gm-select" aria-label="Group system"></select>
+                                    <button id="gm-system-new" class="btn btn-secondary" type="button">New</button>
+                                    <button id="gm-system-rename" class="btn btn-secondary" type="button">Rename</button>
+                                    <button id="gm-system-passcode" class="btn btn-secondary" type="button" title="Set a new passcode for this group system">Passcode</button>
+                                    <button id="gm-system-delete" class="btn btn-secondary" type="button">Delete</button>
+                                    <button id="gm-system-copy" class="btn btn-secondary" type="button" title="Copy a view-only link to this group system">Copy link</button>
+                                </div>
+                            </div>
+
+                            <!-- Create a group system (anyone) -->
+                            <section id="gm-create-panel" class="gm-card gm-unlock-panel" hidden>
+                                <h2 class="gm-card-title">Create a group system</h2>
+                                <p class="gm-unlock-text">
+                                    Give it a name. You'll get a passcode that lets you (and anyone you
+                                    share it with) add people and make rounds; everyone else can only
+                                    view the link. Choose your own passcode or leave it blank for a
+                                    generated one.
+                                </p>
+                                <form id="gm-create-form" class="gm-add-row" autocomplete="off">
+                                    <input id="gm-create-name" class="gm-input" type="text" maxlength="64" placeholder="Name, e.g. Tuesday chess" aria-label="Group system name" required>
+                                    <input id="gm-create-passcode" class="gm-input" type="text" maxlength="128" placeholder="Passcode (optional)" aria-label="Passcode" autocomplete="off">
+                                    <button class="btn btn-primary" type="submit">Create</button>
+                                    <button id="gm-create-cancel" class="btn btn-secondary" type="button">Cancel</button>
+                                </form>
+                                <p id="gm-create-error" class="gm-status gm-status-error" role="alert" style="margin-top: 0.5rem;"></p>
+                            </section>
+
+                            <!-- A newly issued passcode, shown once -->
+                            <section id="gm-reveal-panel" class="gm-card gm-unlock-panel" hidden>
+                                <h2 class="gm-card-title">Passcode for <span id="gm-reveal-name"></span></h2>
+                                <p class="gm-unlock-text">
+                                    Save this somewhere: it is the only way to edit this group, and it
+                                    is not shown again. It's remembered on this device for now.
+                                </p>
+                                <div class="gm-add-row">
+                                    <code id="gm-reveal-code" class="gm-reveal-code"></code>
+                                    <button id="gm-reveal-copy" class="btn btn-primary" type="button">Copy</button>
+                                    <button id="gm-reveal-close" class="btn btn-secondary" type="button">Done</button>
+                                </div>
+                            </section>
+
                             <p id="gm-status" class="gm-status" role="status" aria-live="polite"></p>
 
                             <!-- Passcode panel (shown when the user clicks Edit) -->
                             <section id="gm-unlock-panel" class="gm-card gm-unlock-panel" hidden>
-                                <h2 class="gm-card-title">Enter the organiser passcode</h2>
+                                <h2 class="gm-card-title">Enter the passcode for this group</h2>
                                 <p class="gm-unlock-text">
                                     Anyone can view the groups, but changing the roster or making new
-                                    rounds is reserved for the organiser. If you're meant to run this,
-                                    ask Josh for the passcode. It stays saved on this device until you
-                                    choose <em>Done editing</em>.
+                                    rounds needs this group's passcode. Ask whoever created it, or
+                                    <a href="#" class="gm-system-create">create a group of your own</a>.
+                                    It stays saved on this device until you choose <em>Done editing</em>.
                                 </p>
                                 <form id="gm-unlock-form" class="gm-add-row" autocomplete="off">
                                     <input id="gm-passcode" class="gm-input" type="password" placeholder="Passcode"
@@ -72,7 +122,7 @@
                             </section>
 
                             <p class="gm-viewer gm-hint" style="margin-top: 0.75rem;">
-                                You're viewing. Click <strong>Edit</strong> to add people or make groups.
+                                You're viewing. Click <strong>Edit</strong> if you have the passcode, or create your own group.
                             </p>
 
                             <!-- Members -->
