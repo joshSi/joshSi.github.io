@@ -194,6 +194,13 @@
                             <!-- History -->
                             <details class="gm-card gm-history">
                                 <summary class="gm-card-title">Round history <span id="gm-history-count" class="gm-pill">0</span></summary>
+                                <div class="gm-export">
+                                    <span class="gm-hint">Export for Excel or Google Sheets:</span>
+                                    <button class="btn btn-secondary gm-export-btn" type="button" data-export="long" title="One row per person per round: Round, Group, Member">Rows per person</button>
+                                    <button class="btn btn-secondary gm-export-btn" type="button" data-export="wide" title="One row per round, one column per group">Rows per round</button>
+                                    <button class="btn btn-secondary gm-export-btn" type="button" data-export="matrix" title="How many times each pair has shared a group">Familiarity matrix</button>
+                                    <button class="btn btn-secondary gm-export-btn" type="button" data-export="copy" title="Copy the rows-per-person table to paste into a spreadsheet">Copy as table</button>
+                                </div>
                                 <div id="gm-history" class="gm-history-list"></div>
                             </details>
 

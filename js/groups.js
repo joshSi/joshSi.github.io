@@ -406,6 +406,85 @@
     }).join('');
   }
 
+  // ——— Export (CSV for Excel / Google Sheets, TSV for the clipboard) ———
+  function slug(name) {
+    return String(name || 'groups').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'groups';
+  }
+
+  /** Rows for an export. `kind`: long (Round, Group, Member), wide (one row per round), matrix. */
+  function exportRows(kind) {
+    var rows = [];
+    if (kind === 'long') {
+      rows.push(['Round', 'Group', 'Member']);
+      state.history.forEach(function (round, r) {
+        round.forEach(function (group, g) {
+          group.forEach(function (name) { rows.push([r + 1, g + 1, name]); });
+        });
+      });
+    } else if (kind === 'wide') {
+      var width = state.history.reduce(function (m, round) { return Math.max(m, round.length); }, 0);
+      var head = ['Round'];
+      for (var i = 1; i <= width; i++) head.push('Group ' + i);
+      rows.push(head);
+      state.history.forEach(function (round, r) {
+        var row = [r + 1];
+        for (var g = 0; g < width; g++) row.push(round[g] ? round[g].join(', ') : '');
+        rows.push(row);
+      });
+    } else if (kind === 'matrix') {
+      rows.push(['Times met'].concat(state.members));
+      state.members.forEach(function (name, i) {
+        rows.push([name].concat(state.members.map(function (_, j) { return i === j ? '' : state.familiarity[i][j] / 2; })));
+      });
+    }
+    return rows;
+  }
+
+  function cell(v, sep) {
+    var t = v === null || v === undefined ? '' : String(v);
+    if (sep === '\t') return t.replace(/[\t\r\n]+/g, ' ');
+    // Excel runs cells starting with = + - @ as formulas; neutralise them.
+    if (/^[=+\-@]/.test(t)) t = "'" + t;
+    return /[",\r\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+  }
+
+  function table(rows, sep) {
+    return rows.map(function (r) { return r.map(function (v) { return cell(v, sep); }).join(sep); }).join('\r\n') + '\r\n';
+  }
+
+  function downloadText(filename, text, mime) {
+    // The BOM makes Excel read the file as UTF-8 (accents, non-Latin names).
+    var blob = new Blob(['\ufeff' + text], { type: mime });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function exportHistory(kind) {
+    if (kind !== 'matrix' && !state.history.length) { setStatus('No rounds to export yet.', 'error'); return; }
+    if (kind === 'matrix' && state.members.length < 2) { setStatus('Add at least two people to export the matrix.', 'error'); return; }
+    var base = slug(state.system && state.system.name);
+    if (kind === 'copy') {
+      var tsv = table(exportRows('long'), '\t');
+      var done = function () { setStatus('Table copied. Paste it into a spreadsheet.', 'ok'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(tsv).then(done, function () { window.prompt('Copy this table:', tsv); });
+      else window.prompt('Copy this table:', tsv);
+      return;
+    }
+    var names = { long: 'rounds-by-person', wide: 'rounds', matrix: 'familiarity' };
+    downloadText(base + '-' + names[kind] + '.csv', table(exportRows(kind), ','), 'text/csv;charset=utf-8');
+    setStatus('Downloaded ' + base + '-' + names[kind] + '.csv. Open it in Excel or import it into Google Sheets.', 'ok');
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.gm-export-btn'), function (b) {
+    b.addEventListener('click', function () { exportHistory(b.getAttribute('data-export')); });
+  });
+
   // ——— Manual round parsing ———
   /** "A, B\nC; D" → [["A","B"],["C","D"]]. Returns {groups} or {error}. */
   function parseManualGroups(text) {

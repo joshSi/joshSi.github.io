@@ -1211,3 +1211,7 @@ a:focus-visible {
 /* Group Maker: issued passcode */
 .gm-reveal-code { font-size: 1.15rem; padding: 0.55rem 0.8rem; border: 1px dashed var(--color-border, #ccc); border-radius: 0.5rem; letter-spacing: 0.04em; user-select: all; }
 .gm-system-controls .gm-system-name { margin: 0; }
+
+/* Group Maker: history export */
+.gm-export { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0.75rem 0 0.25rem; }
+.gm-export .gm-hint { margin-right: 0.25rem; }
