@@ -1,3 +1,4 @@
+/** v2026-10-06 */
 /**
  * Group Maker — Vanilla JS client for the balanced_groups API.
  *
