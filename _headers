@@ -1,0 +1,8 @@
+# Cloudflare Pages headers. Scripts and styles are small and change with the
+# pages that use them, so revalidate them on every load (ETags keep it cheap)
+# instead of the default four-hour cache, which left browsers running old JS
+# against new HTML after a deploy.
+/js/*
+  Cache-Control: public, max-age=0, must-revalidate
+/css/*
+  Cache-Control: public, max-age=0, must-revalidate
