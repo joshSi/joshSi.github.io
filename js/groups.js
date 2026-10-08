@@ -666,6 +666,7 @@
     // The same box takes the admin key or this group's passcode: try the
     // admin list first, then ask the current system whether the code may edit it.
     var h = { 'Accept': 'application/json', 'Authorization': 'Bearer ' + code };
+    var prevId = null;
     fetch(api + '/api/systems', { method: 'GET', mode: 'cors', headers: h }).then(function (res) {
       if (res.ok) return res.json().then(function (data) {
         systems = data.systems || [];
@@ -673,6 +674,10 @@
         return 'admin';
       });
       if (res.status !== 401 && res.status !== 503) throw new Error('Could not check the passcode (' + res.status + ').');
+      // A generated passcode starts with its group's id ("pairs-2qwx-k7mq-4x2p-9hd3"),
+      // so it opens the right group even if the page was loaded without ?g=.
+      var m = /^([a-z0-9][a-z0-9-]*)-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}$/.exec(code);
+      if (m && m[1] !== systemId) { prevId = systemId; systemId = m[1]; setUrlSystem(systemId); }
       return fetch(api + sys('/api/state'), { method: 'GET', mode: 'cors', headers: h }).then(function (r2) {
         if (!r2.ok) throw new Error('Could not check the passcode (' + r2.status + ').');
         return r2.json();
@@ -688,6 +693,7 @@
       renderAll();
       setStatus("You're editing. Changes save instantly and stay on this device until you click Done editing.", 'ok');
     }).catch(function (err) {
+      if (prevId !== null) { systemId = prevId; setUrlSystem(systemId); }
       unlockError.textContent = err.message || 'Could not reach the server.';
     }).finally(function () { setBusy(false); });
   });
