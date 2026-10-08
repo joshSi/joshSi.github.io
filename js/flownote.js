@@ -221,6 +221,7 @@
     }).then(function (sf) {
       setStatus('Preparing instruments…', null, true);
       var synth = new lib.WorkletSynthesizer(ctx);
+      synth.connect(ctx.destination); // the synth does not output anywhere by itself
       return synth.soundBankManager.addSoundBank(sf, 'main').then(function () {
         return synth.isReady;
       }).then(function () {
