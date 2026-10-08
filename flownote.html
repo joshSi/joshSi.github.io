@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowNote — Josh Si</title>
+    <link rel="canonical" href="https://joshsi.com/flownote">
+    <meta name="description" content="Write music in FlowNote, a text notation built for fast transcription, then play it in the browser or download it as a MIDI file.">
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div id="main-content">
+        <div class="container-outer site-nav-outer">
+            <div class="container-inner-wrap">
+                <div class="container-inner">
+                    <div class="container-content">
+                        <nav class="site-nav fade-in" aria-label="Primary">
+                        <a href="/" class="site-nav-brand" hx-get="/" hx-target="#main-content" hx-select="#main-content > *" hx-swap="innerHTML transition:true" hx-push-url="true">Josh Si</a>
+                        <div class="site-nav-links">
+                            <a href="/memorize.html" hx-get="/memorize.html" hx-target="#main-content" hx-select="#main-content > *" hx-swap="innerHTML transition:true" hx-push-url="true">Memorize</a>
+                            <a href="/groups.html" hx-get="/groups.html" hx-target="#main-content" hx-select="#main-content > *" hx-swap="innerHTML transition:true" hx-push-url="true">Groups</a>
+                            <a href="/flownote.html" hx-get="/flownote.html" hx-target="#main-content" hx-select="#main-content > *" hx-swap="innerHTML transition:true" hx-push-url="true" aria-current="page">FlowNote</a>
+                            <a href="https://quizi.joshsi.com" target="_blank" rel="noopener noreferrer">Quizi<span class="site-nav-ext" aria-hidden="true">↗</span></a>
+                            <a href="https://git.joshsi.com" target="_blank" rel="noopener noreferrer">Git<span class="site-nav-ext" aria-hidden="true">↗</span></a>
+                        </div>
+                    </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-outer" style="padding-top: 1rem; padding-bottom: 4rem;">
+            <div class="container-inner-wrap" style="width: 100%;">
+                <div class="container-inner">
+                    <div class="container-content">
+
+                        <div id="fn-app" class="fade-in fade-in-delay-1">
+
+                            <header class="gm-header">
+                                <div>
+                                    <h1 class="gm-title">FlowNote</h1>
+                                    <p class="text-body" style="margin-top: 0.5rem; max-width: 40rem;">
+                                        Write music as plain text, then hear it and take the MIDI file.
+                                        Scores are compiled on the server by
+                                        <a href="https://codeberg.org/joshSi/conductor" target="_blank" rel="noopener noreferrer">conductor</a>
+                                        and played here with a SoundFont. New to the notation? Start with
+                                        the <a href="https://codeberg.org/joshSi/conductor/src/branch/main/flownote.md" target="_blank" rel="noopener noreferrer">syntax reference</a>.
+                                    </p>
+                                </div>
+                            </header>
+
+                            <section class="gm-card fn-card">
+                                <label class="fn-label" for="fn-source">Score</label>
+                                <textarea id="fn-source" class="gm-input fn-source" spellcheck="false" autocomplete="off"
+                                    autocorrect="off" autocapitalize="off" rows="14"
+                                    aria-describedby="fn-status"></textarea>
+
+                                <div class="fn-controls">
+                                    <button id="fn-play" class="btn btn-primary" type="button">Play</button>
+                                    <button id="fn-stop" class="btn btn-secondary" type="button" disabled>Stop</button>
+                                    <label class="fn-tempo">
+                                        Tempo
+                                        <input id="fn-bpm" class="gm-input gm-input-sm" type="number" min="20" max="400" step="1"
+                                            inputmode="numeric" placeholder="from score" aria-label="Tempo override in BPM">
+                                        <span class="fn-unit">BPM</span>
+                                    </label>
+                                    <span class="fn-spacer"></span>
+                                    <a id="fn-download" class="btn btn-secondary fn-disabled" download aria-disabled="true">Download .mid</a>
+                                    <button id="fn-share" class="btn btn-secondary" type="button" disabled
+                                        title="Copy a link that reopens this score for the next 24 hours">Copy link</button>
+                                </div>
+
+                                <div class="fn-transport" id="fn-transport" hidden>
+                                    <input id="fn-seek" class="fn-seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Playback position">
+                                    <span id="fn-time" class="fn-time">0:00 / 0:00</span>
+                                </div>
+
+                                <p id="fn-status" class="gm-status" role="status" aria-live="polite"></p>
+                                <p class="fn-note">Ctrl/Cmd + Enter plays. Links and downloads are kept for 24 hours after your last compile.</p>
+                            </section>
+
+                        </div>
+
+                        <script src="/js/flownote.js"></script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1217,3 +1217,20 @@ a:focus-visible {
 .gm-export .gm-hint { margin-right: 0.25rem; }
 
 /* v2026-10-06 */
+
+/* FlowNote */
+.fn-card { display: flex; flex-direction: column; gap: 0.75rem; }
+.fn-label { font-size: 0.8125rem; font-weight: 600; color: var(--color-fg-muted); }
+.fn-source { width: 100%; box-sizing: border-box; resize: vertical; min-height: 8rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9375rem; line-height: 1.5; tab-size: 2; }
+.fn-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.fn-spacer { flex: 1 1 0; }
+.fn-tempo { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.875rem; color: var(--color-fg-muted); }
+.fn-tempo .gm-input-sm { width: 6.5rem; padding: 0.4rem 0.6rem; font-size: 0.875rem; }
+.fn-unit { font-size: 0.8125rem; color: var(--color-fg-subtle); }
+.fn-transport { display: flex; align-items: center; gap: 0.75rem; }
+.fn-seek { flex: 1 1 auto; accent-color: var(--color-accent); }
+.fn-time { font-size: 0.8125rem; font-variant-numeric: tabular-nums; color: var(--color-fg-muted); white-space: nowrap; }
+.fn-note { margin: 0; font-size: 0.8125rem; color: var(--color-fg-subtle); }
+.fn-card .gm-status { margin-top: 0; min-height: 0; }
+.fn-card .gm-status-error { white-space: pre-wrap; }
+.fn-card .btn[disabled], .fn-card .fn-disabled { opacity: 0.5; pointer-events: none; }
