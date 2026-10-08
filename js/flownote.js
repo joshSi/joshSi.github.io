@@ -27,9 +27,10 @@
     '// TEMPO: 108',
     '// Twinkle, twinkle: melody over a simple bass',
     '"melody" = |c/4 c g g a a g/2 f/4 f e e d d c/2|@piano',
-    '"bass"   = |c,/2 e, f, e, d, g, c,/1|@strings',
+    '"bass"   = |c,/2 e, f, e, d, g, b,, e,|@strings',
+    '"kick"   = |c,,/4|*16 @drums',
     '',
-    '"melody" & "bass"',
+    '"melody" & "bass" & "kick"',
     ''
   ].join('\n');
 
